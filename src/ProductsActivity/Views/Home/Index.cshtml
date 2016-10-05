@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+    <script src="~/lib/angular/angular.js"></script>
+
+    <div ng-app="myApp" ng-controller="myC">
+        <h1>Products Page</h1>
+        <button ng-click="showProducts()">Browse Products</button>
+        <button ng-click="showAddProduct()">Add a Product</button>
+
+        <div ng-show="showBrowse">
+            <h2>Browse Products</h2>
+            <table border="1">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Details</th>
+                    <th>Type</th>
+                </tr>
+
+                <tr ng-repeat="x in allResults">
+                    <td>{{x.id}}</td>
+                    <td>{{x.name}}</td>
+                    <td>{{x.details}}</td>
+                    <td ng-if="x.type==0">NEW</td>
+                    <td ng-if="x.type==1">OLD</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div ng-show="showAdd">
+            <h2>Add a Product</h2>
+
+            <div>
+
+            </div>
+            <label>ID</label><input type="text" ng-model="y.id" /><br />
+            <label>Name</label><input type="text" ng-model="y.name" /><br />
+            <label>Details</label><input type="text" ng-model="y.details" /><br />
+            
+            <label>Type</label>
+            <select>
+                <option value="0" label ="NEW"></option>
+                <option value="1" label ="OLD"></option>
+            </select>
+
+        
+
+
+            <button ng-click="saveData()">Save</button>
+            <button ng-click="findData()">Find Product</button>
+
+
+        </div>
+    </div>
+
+    <script>
+        var app = angular.module("myApp", []);
+        app.controller("myC", function ($scope, $http) {
+
+            $scope.showProducts = function () {
+                $scope.showBrowse = true;
+                $scope.showAdd = false;
+
+                $http.get('/AJAX/GetProducts').success(function (data) {
+                    $scope.allResults = data;
+                })
+            }
+
+            $scope.showAddProduct = function () {
+                $scope.showBrowse = false;
+                $scope.showAdd = true;
+            }
+
+            $scope.saveData = function () {
+
+                $http({ method: 'POST', url: '/AJAX/SaveProduct', data: $scope.y }).success(function (strData) {
+
+                    $scope.y.id = "";
+                    $scope.y.name = "";
+                    $scope.y.details = "";
+                    $scope.y.type = "";
+
+                    alert(strData);
+
+                })
+
+
+            }
+            
+
+            $scope.findData = function () {
+                $http.get('/AJAX/FindProduct/'+$scope.y.id).success(function (data) {
+                    $scope.y = data;
+
+                   
+
+                })
+            }
+
+        })
+    </script>
+
+
+</body>
+
+</html>
